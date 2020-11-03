@@ -13,8 +13,14 @@
  * @param {string} alphabet Stafróf sem afkóða á út frá
  * @returns {string} Upprunalegi strengurinn hliðraður um n til hægri
  */
-function encode(str, n, alphabet = '') {
-  return 'Hello';
+function encode(str, n, alphabet) {
+  const upper = str.toLocaleUpperCase();
+
+  let result = '';
+  for (let i = 0; i < str.length; i++) {
+    result += alphabet[(alphabet.indexOf(upper[i]) + n) % alphabet.length];
+  }
+  return result;
 }
 
 /**
@@ -25,8 +31,15 @@ function encode(str, n, alphabet = '') {
  * @param {string} alphabet Stafróf sem afkóða á út frá
  * @returns {string} Upprunalegi strengurinn hliðraður um n til vinstri
  */
-function decode(str, n, alphabet = '') {
-  return 'Wadd';
+function decode(str, n, alphabet) {
+    // dæmi sem notar „fallaforritun“
+    return str
+    .toLocaleUpperCase()
+    .split('')
+    .map(s => alphabet.indexOf(s) - n) // hliðruð staðsetning stafs
+    .map(i => i < 0 ? alphabet.length + i : i) // ef i verður neikvætt, förum aftast í stafróf
+    .map(i => alphabet[i])
+    .join('');
 }
 
 const Caesar = (() => {
@@ -40,8 +53,7 @@ const Caesar = (() => {
   let shift = 3;
 
   // Strengurinn í Strengur input
-
-  let currentString;
+  let currentString = "";
 
   function init(el) {
     // Setja event handlera á viðeigandi element
@@ -49,11 +61,14 @@ const Caesar = (() => {
     // inputAlphabet eventlistener - breyting a stafrofi
     const inputAlphabet = document.querySelector('input[name=alphabet]');
 
+    //kýs að hafa change því input er svo janky
     inputAlphabet.addEventListener('change', (e) => {
       const { target } = e;
       console.log(`Alphabet before: ${alphabet}`);
-      alphabet = e.target.value;
+      let newAlphabet = e.target.value;
+      alphabet = newAlphabet.toLocaleUpperCase().trim();
       console.log(`Alphabet after : ${alphabet}`);
+      output();
     });
 
     // querySelector fyrir shiftValue
@@ -66,12 +81,11 @@ const Caesar = (() => {
       const { target } = e;
       //console.log(e.target.value);
       //console.log(`shift before: ${shift}`);
-      shift = e.target.value;
+      shift = parseInt (e.target.value);
       //console.log(`shift after : ${shift}`);
       shiftVal.textContent = shift;
       output();
     });
-
 
     // radio eventlistener
     const radios = document.querySelectorAll('input[type=radio]');
@@ -109,21 +123,45 @@ const Caesar = (() => {
      */
     function output(){
       let outputString;
+      let codeInput = legalCharString(currentString);
+      console.log(`codeInput: ${codeInput}`);
       switch(type) {
         case 'encode':
-          outputString = encode(currentString, shift, alphabet);
+          console.log(`alphabet = ${alphabet}`)
+          outputString = encode(codeInput, shift, alphabet);
           break;
         case 'decode':
-          outputString = decode(currentString, shift, alphabet);
+          outputString = decode(codeInput, shift, alphabet);
           break;
         default:
           console.log(`Critical error radio value is ${type}`);
       }
       resultOutput.textContent = outputString;
     }
+
+    /**
+     * Fall til að undirbúa streng til kóðunnar.
+     * Fallið biggir streng sem er einungis með stöfum úr stafrófi
+     * @param {string} stringToTrim
+     * @return trimmedString
+     */
+    function legalCharString(stringToTrim){
+      let trimmedString = "";
+      for(let i = 0; i < stringToTrim.length; i++) {
+        const letter = (stringToTrim[i]).toLocaleUpperCase();
+        if (alphabet.indexOf(letter) < 0) {
+          console.log(`${letter} skip!`)
+          continue;
+        }
+        else {
+         // console.log(`${trimmedString} + ${letter}`);
+          trimmedString = trimmedString.concat(letter);
+         // console.log(`= ${trimmedString}`);
+        }
+      }
+      return trimmedString;
+    }
   }
-
-
 
   return {
     init,
