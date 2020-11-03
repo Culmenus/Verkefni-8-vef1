@@ -64,10 +64,8 @@ const Caesar = (() => {
     //kýs að hafa change því input er svo janky
     inputAlphabet.addEventListener('change', (e) => {
       const { target } = e;
-      console.log(`Alphabet before: ${alphabet}`);
       let newAlphabet = e.target.value;
       alphabet = newAlphabet.toLocaleUpperCase().trim();
-      console.log(`Alphabet after : ${alphabet}`);
       output();
     });
 
@@ -79,10 +77,7 @@ const Caesar = (() => {
 
     range.addEventListener('input', (e) => {
       const { target } = e;
-      //console.log(e.target.value);
-      //console.log(`shift before: ${shift}`);
       shift = parseInt (e.target.value);
-      //console.log(`shift after : ${shift}`);
       shiftVal.textContent = shift;
       output();
     });
@@ -108,9 +103,7 @@ const Caesar = (() => {
 
     inputString.addEventListener('input', (e) => {
       const { target } = e;
-      console.log(`inputString: ${e.target.value}`);
       currentString = e.target.value;
-      //console.log(`currentString: ${currentString}`);
       output();
     });
 
@@ -124,10 +117,8 @@ const Caesar = (() => {
     function output(){
       let outputString;
       let codeInput = legalCharString(currentString);
-      console.log(`codeInput: ${codeInput}`);
       switch(type) {
         case 'encode':
-          console.log(`alphabet = ${alphabet}`)
           outputString = encode(codeInput, shift, alphabet);
           break;
         case 'decode':
@@ -150,13 +141,10 @@ const Caesar = (() => {
       for(let i = 0; i < stringToTrim.length; i++) {
         const letter = (stringToTrim[i]).toLocaleUpperCase();
         if (alphabet.indexOf(letter) < 0) {
-          console.log(`${letter} skip!`)
           continue;
         }
         else {
-         // console.log(`${trimmedString} + ${letter}`);
           trimmedString = trimmedString.concat(letter);
-         // console.log(`= ${trimmedString}`);
         }
       }
       return trimmedString;
