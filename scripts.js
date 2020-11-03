@@ -17,7 +17,7 @@ function encode(str, n, alphabet) {
   const upper = str.toLocaleUpperCase();
 
   let result = '';
-  for (let i = 0; i < str.length; i++) {
+  for (let i = 0; i < str.length; i += 1) {
     result += alphabet[(alphabet.indexOf(upper[i]) + n) % alphabet.length];
   }
   return result;
@@ -32,13 +32,13 @@ function encode(str, n, alphabet) {
  * @returns {string} Upprunalegi strengurinn hliðraður um n til vinstri
  */
 function decode(str, n, alphabet) {
-    // dæmi sem notar „fallaforritun“
-    return str
+  // dæmi sem notar „fallaforritun“
+  return str
     .toLocaleUpperCase()
     .split('')
-    .map(s => alphabet.indexOf(s) - n) // hliðruð staðsetning stafs
-    .map(i => i < 0 ? alphabet.length + i : i) // ef i verður neikvætt, förum aftast í stafróf
-    .map(i => alphabet[i])
+    .map((s) => alphabet.indexOf(s) - n) // hliðruð staðsetning stafs
+    .map((i) => (i < 0 ? alphabet.length + i : i)) // ef i verður neikvætt, förum aftast í stafróf
+    .map((i) => alphabet[i])
     .join('');
 }
 
@@ -53,18 +53,59 @@ const Caesar = (() => {
   let shift = 3;
 
   // Strengurinn í Strengur input
-  let currentString = "";
+  let currentString = '';
 
-  function init(el) {
+  /**
+ * Fall til að undirbúa streng til kóðunnar.
+ * Fallið biggir streng sem er einungis með stöfum úr stafrófi
+ * @param {string} stringToTrim
+ * @return trimmedString
+ */
+  function legalCharString(stringToTrim) {
+    let trimmedString = '';
+    for (let i = 0; i < stringToTrim.length; i += 1) {
+      const letter = (stringToTrim[i]).toLocaleUpperCase();
+      if (alphabet.indexOf(letter) >= 0) {
+        trimmedString = trimmedString.concat(letter);
+      }
+    }
+    return trimmedString;
+  }
+
+  /**
+ * Fallið kallar á annaðhvort encode eða decode eftir
+ * núvernadi stöðu á global breytunum og breytir
+ * textContent i result div-inu.
+ * @param Ekkert
+ * @return Ekkert
+ */
+  function output() {
+    // querySelector fyrir results
+    const resultOutput = document.querySelector('div[class=result]');
+    let outputString;
+    const codeInput = legalCharString(currentString);
+    switch (type) {
+      case 'encode':
+        outputString = encode(codeInput, shift, alphabet);
+        break;
+      case 'decode':
+        outputString = decode(codeInput, shift, alphabet);
+        break;
+      default:
+        console.log(`Critical error radio value is ${type}`);
+    }
+    resultOutput.textContent = outputString;
+  }
+
+  function init() {
     // Setja event handlera á viðeigandi element
 
     // inputAlphabet eventlistener - breyting a stafrofi
     const inputAlphabet = document.querySelector('input[name=alphabet]');
 
-    //kýs að hafa change því input er svo janky
+    // kýs að hafa change því input er svo janky
     inputAlphabet.addEventListener('change', (e) => {
-      const { target } = e;
-      let newAlphabet = e.target.value;
+      const newAlphabet = e.target.value;
       alphabet = newAlphabet.toLocaleUpperCase().trim();
       output();
     });
@@ -72,12 +113,11 @@ const Caesar = (() => {
     // querySelector fyrir shiftValue
     const shiftVal = document.querySelector('span[class=shiftValue]');
 
-    //range eventlistener
+    // range eventlistener
     const range = document.querySelector('input[type=range]');
 
     range.addEventListener('input', (e) => {
-      const { target } = e;
-      shift = parseInt (e.target.value);
+      shift = Number.parseInt(e.target.value, 10);
       shiftVal.textContent = shift;
       output();
     });
@@ -86,71 +126,22 @@ const Caesar = (() => {
     const radios = document.querySelectorAll('input[type=radio]');
 
     function radioChanged(e) {
-      const { target } = e;
       type = e.target.value;
       output();
     }
 
-    for (let i = 0; i < radios.length; i++) {
+    for (let i = 0; i < radios.length; i += 1) {
       radios[i].addEventListener('change', radioChanged);
     }
-
-    // querySelector fyrir results
-    const resultOutput = document.querySelector('div[class=result]');
 
     // inputString eventlistener - strengur til að dulkóða
     const inputString = document.querySelector('input[name=input]');
 
     inputString.addEventListener('input', (e) => {
-      const { target } = e;
       currentString = e.target.value;
       output();
     });
-
-    /**
-     * Fallið kallar á annaðhvort encode eða decode eftir
-     * núvernadi stöðu á global breytunum og breytir
-     * textContent i result div-inu.
-     * @param Ekkert
-     * @return Ekkert
-     */
-    function output(){
-      let outputString;
-      let codeInput = legalCharString(currentString);
-      switch(type) {
-        case 'encode':
-          outputString = encode(codeInput, shift, alphabet);
-          break;
-        case 'decode':
-          outputString = decode(codeInput, shift, alphabet);
-          break;
-        default:
-          console.log(`Critical error radio value is ${type}`);
-      }
-      resultOutput.textContent = outputString;
-    }
-
-    /**
-     * Fall til að undirbúa streng til kóðunnar.
-     * Fallið biggir streng sem er einungis með stöfum úr stafrófi
-     * @param {string} stringToTrim
-     * @return trimmedString
-     */
-    function legalCharString(stringToTrim){
-      let trimmedString = "";
-      for(let i = 0; i < stringToTrim.length; i++) {
-        const letter = (stringToTrim[i]).toLocaleUpperCase();
-        if (alphabet.indexOf(letter) < 0) {
-          continue;
-        }
-        else {
-          trimmedString = trimmedString.concat(letter);
-        }
-      }
-      return trimmedString;
-    }
   }
-
   return {
     init,
   };

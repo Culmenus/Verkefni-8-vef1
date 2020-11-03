@@ -5,7 +5,7 @@
   "main": "scripts.js",
   "scripts": {
     "dev": "browser-sync start --server --files scripts.js styles.css",
-    "test": "eslint scripts.js"
+    "test": "eslint scripts.js --fix"
   },
   "repository": {
     "type": "git",
@@ -20,7 +20,7 @@
   "homepage": "https://github.com/vefforritun/vef1-2020-v7-synilausn#readme",
   "devDependencies": {
     "browser-sync": "^2.26.13",
-    "eslint": "^7.12.0",
+    "eslint": "^7.12.1",
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-plugin-import": "^2.22.1"
   }
